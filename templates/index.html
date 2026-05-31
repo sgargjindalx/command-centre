@@ -84,6 +84,11 @@
 </header>
 
 <div class="container">
+  {% if error %}
+  <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:16px 20px;margin-bottom:20px;color:#7f1d1d;font-size:13px;">
+    <strong>⚠ Configuration error:</strong> {{ error }}
+  </div>
+  {% endif %}
 
   <!-- Projects -->
   <div class="projects">
