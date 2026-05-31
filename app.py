@@ -17,6 +17,14 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__, template_folder="templates", static_folder="static")
 app.config["SECRET_KEY"] = config.SECRET_KEY
 
+# Apply schema at import time so gunicorn workers pick it up.
+# Wrapped in try/except so the app starts even if the DB isn't
+# reachable yet — Railway wires DATABASE_URL after the build step.
+try:
+    database.apply_schema()
+except Exception as _e:
+    logger.warning("apply_schema() skipped at startup: %s", _e)
+
 
 # ── Auth helpers ──────────────────────────────────────────────────────
 def _check_api_key():
@@ -74,12 +82,14 @@ def index():
 # ── Health ────────────────────────────────────────────────────────────
 @app.route("/health")
 def health():
+    # Always return 200 so Railway's healthcheck passes even when the
+    # DB is temporarily unreachable (e.g. during initial provisioning).
     ok = database.healthcheck()
     return jsonify({
         "status": "ok" if ok else "degraded",
         "db": "ok" if ok else "fail",
         "timestamp": datetime.utcnow().isoformat() + "Z",
-    }), (200 if ok else 503)
+    }), 200
 
 
 # ── GET /api/projects ─────────────────────────────────────────────────
