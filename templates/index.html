@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSL Command Centre</title>
+<style>
+  :root {
+    --bg: #eef0f5;
+    --card: #ffffff;
+    --border: #d0d7de;
+    --text: #1f2328;
+    --dim: #57606a;
+    --accent: #0969da;
+    --green: #1a7f37;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text);
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         font-size: 14px; line-height: 1.5; }
+
+  header {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 14px 32px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  header h1 { font-size: 18px; font-weight: 700; }
+  header .sub { font-size: 12px; color: var(--dim); }
+  header a { margin-left: auto; font-size: 12px; color: var(--accent); text-decoration: none; }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+
+  /* Projects strip */
+  .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: 16px; margin-bottom: 28px; }
+  .project-card {
+    background: #fff;
+    border-radius: 12px;
+    border-top: 3px solid var(--accent);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 18px 20px;
+  }
+  .project-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .project-card .desc { font-size: 12px; color: var(--dim); margin-bottom: 12px; }
+  .project-card .meta { display: flex; gap: 16px; font-size: 11px; color: var(--dim); }
+  .project-card .meta strong { color: var(--text); }
+  .project-card a { font-size: 11px; color: var(--accent); }
+
+  /* Updates feed */
+  .feed-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+  .feed-header h2 { font-size: 15px; font-weight: 600; }
+  .feed-header .count { font-size: 12px; color: var(--dim); }
+
+  .update-list { display: flex; flex-direction: column; gap: 10px; }
+  .update-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    padding: 14px 18px;
+    display: grid;
+    grid-template-columns: 90px 120px 1fr 80px;
+    gap: 12px;
+    align-items: start;
+  }
+  .update-date { font-size: 12px; font-weight: 600; color: var(--dim); font-family: monospace; }
+  .update-project { font-size: 11px; font-weight: 600; color: var(--accent);
+                    background: #e8f0fe; border-radius: 4px; padding: 2px 8px;
+                    white-space: nowrap; align-self: start; }
+  .update-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .update-source { font-size: 10px; color: #aaa; text-align: right; padding-top: 2px; }
+
+  .empty { text-align: center; padding: 60px; color: var(--dim); }
+  .empty h2 { color: var(--text); margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>JSL Command Centre</h1>
+    <div class="sub">Project update log · {{ projects|length }} active project{{ 's' if projects|length != 1 }}</div>
+  </div>
+  <a href="/health">⬤ health</a>
+</header>
+
+<div class="container">
+
+  <!-- Projects -->
+  <div class="projects">
+    {% for p in projects %}
+    <div class="project-card">
+      <h3>{{ p.name }}</h3>
+      <div class="desc">{{ p.description or '—' }}</div>
+      <div class="meta">
+        <span><strong>{{ p.update_count }}</strong> updates</span>
+        <span>Last: <strong>{{ p.last_update or '—' }}</strong></span>
+        {% if p.url %}<a href="{{ p.url }}" target="_blank">↗ Open</a>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Update feed -->
+  <div class="feed-header">
+    <h2>Recent Updates</h2>
+    <span class="count">{{ updates|length }} shown</span>
+  </div>
+
+  {% if updates %}
+  <div class="update-list">
+    {% for u in updates %}
+    <div class="update-card">
+      <div class="update-date">{{ u.update_date }}</div>
+      <div class="update-project">{{ u.project_name }}</div>
+      <div class="update-text">{{ u.update_text }}</div>
+      <div class="update-source">{{ u.source }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <h2>No updates yet</h2>
+    <p>POST to <code>/api/log-update</code> to log your first update.</p>
+  </div>
+  {% endif %}
+
+</div>
+</body>
+</html>
