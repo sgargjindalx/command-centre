@@ -141,6 +141,58 @@ def api_projects():
     return jsonify(rows)
 
 
+# ── GET /api/action-items ────────────────────────────────────────────
+@app.route("/api/action-items")
+def api_action_items():
+    if not config.DATABASE_URL:
+        return jsonify({"error": "DATABASE_URL not configured"}), 503
+    _try_apply_schema()
+    try:
+        with database.get_cursor() as cur:
+            cur.execute(
+                """SELECT ai.id, p.name AS project_name, ai.action_text,
+                          ai.detail_text, ai.done, ai.created_at
+                   FROM action_items ai
+                   JOIN projects p ON p.id = ai.project_id
+                   ORDER BY ai.done ASC, ai.created_at ASC""")
+            rows = [dict(r) for r in cur.fetchall()]
+    except Exception as e:
+        logger.exception("/api/action-items DB error")
+        return jsonify({"error": "database unavailable", "detail": str(e)}), 503
+    for r in rows:
+        if isinstance(r.get("created_at"), datetime):
+            r["created_at"] = r["created_at"].isoformat()
+    return jsonify(rows)
+
+
+# ── PATCH /api/action-items/<id> ──────────────────────────────────────
+@app.route("/api/action-items/<int:item_id>", methods=["PATCH"])
+def api_action_item_patch(item_id):
+    if not config.DATABASE_URL:
+        return jsonify({"error": "DATABASE_URL not configured"}), 503
+    body = request.get_json(silent=True) or {}
+    if "done" not in body:
+        return jsonify({"error": "done (bool) required"}), 400
+    try:
+        with database.get_cursor(commit=True) as cur:
+            cur.execute(
+                "UPDATE action_items SET done=%s WHERE id=%s RETURNING id, done",
+                (bool(body["done"]), item_id))
+            row = cur.fetchone()
+            if not row:
+                return jsonify({"error": "not found"}), 404
+    except Exception as e:
+        logger.exception("/api/action-items PATCH DB error")
+        return jsonify({"error": "database unavailable", "detail": str(e)}), 503
+    return jsonify({"ok": True, "id": row["id"], "done": row["done"]})
+
+
+# ── GET /api/updates (alias for project-updates) ──────────────────────
+@app.route("/api/updates")
+def api_updates():
+    return api_project_updates()
+
+
 # ── GET /api/project-updates ──────────────────────────────────────────
 @app.route("/api/project-updates")
 def api_project_updates():

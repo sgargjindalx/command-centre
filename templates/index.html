@@ -6,129 +6,279 @@
 <title>SG Cmd Centre</title>
 <style>
   :root {
-    --bg: #eef0f5;
-    --card: #ffffff;
-    --border: #d0d7de;
-    --text: #1f2328;
-    --dim: #57606a;
-    --accent: #0969da;
-    --green: #1a7f37;
+    --bg:     #eef0f5;
+    --card:   #ffffff;
+    --border: #e2e6ed;
+    --text:   #1a1d23;
+    --dim:    #6b7280;
+    --dimmer: #9ca3af;
+    --accent: #2563eb;
+    --shadow: 0 2px 8px rgba(0,0,0,0.07);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text);
          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-         font-size: 14px; line-height: 1.5; }
+         font-size: 14px; line-height: 1.5; min-height: 100vh; }
 
-  header {
-    background: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    padding: 14px 32px;
-    display: flex; align-items: center; gap: 16px;
+  .topbar { background: var(--card);
+            box-shadow: 0 1px 0 var(--border), 0 2px 8px rgba(0,0,0,0.05);
+            padding: 0 28px; height: 52px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-size: 18px; font-weight: 500; }
+  .topbar-date  { font-size: 13px; color: var(--dim); }
+
+  .page { max-width: 1400px; margin: 0 auto; padding: 24px 28px; }
+
+  .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase;
+                   letter-spacing: 0.6px; color: var(--dim); margin-bottom: 10px; }
+
+  .card { background: var(--card); border-radius: 12px;
+          box-shadow: var(--shadow); overflow: hidden; }
+
+  .kpi-strip { display: grid; grid-template-columns: repeat(4,1fr);
+               gap: 14px; margin-bottom: 28px; }
+  .kpi-card  { background: var(--card); border-radius: 12px;
+               box-shadow: var(--shadow); padding: 18px 20px; }
+  .kpi-label { font-size: 11px; color: var(--dim); text-transform: uppercase;
+               letter-spacing: 0.5px; margin-bottom: 8px; }
+  .kpi-value { font-size: 28px; font-weight: 700; line-height: 1; }
+  .kpi-sub   { font-size: 11px; color: var(--dimmer); margin-top: 4px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr;
+           gap: 16px; margin-bottom: 16px; }
+
+  .project-row { display: flex; align-items: center; justify-content: space-between;
+                 padding: 11px 18px; border-bottom: 0.5px solid var(--border); gap: 12px; }
+  .project-row:last-child { border-bottom: none; }
+  .project-info { flex: 1; min-width: 0; }
+  .project-name { font-size: 13px; font-weight: 600; white-space: nowrap;
+                  overflow: hidden; text-overflow: ellipsis; }
+  .project-desc { font-size: 11px; color: var(--dim); margin-top: 1px; }
+  .project-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  .badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .badge-active { background: #dcfce7; color: #15803d; }
+  .badge-dev    { background: #fef3c7; color: #b45309; }
+  .badge-paused { background: #f3f4f6; color: #6b7280; }
+
+  .link-icon { color: var(--dimmer); text-decoration: none; font-size: 14px;
+               opacity: 0.6; transition: opacity 0.15s; }
+  .link-icon:hover { opacity: 1; color: var(--accent); }
+
+  .action-row { display: flex; align-items: flex-start; gap: 10px; padding: 11px 18px;
+                border-bottom: 0.5px solid var(--border); transition: background 0.1s; }
+  .action-row:last-child { border-bottom: none; }
+  .action-row:hover { background: #f8fafc; }
+  .action-row.done { opacity: 0.45; }
+
+  .action-cb { width: 16px; height: 16px; border-radius: 4px;
+               border: 1.5px solid var(--border); cursor: pointer; flex-shrink: 0;
+               margin-top: 2px; appearance: none; -webkit-appearance: none;
+               background: white; transition: all 0.15s; }
+  .action-cb:checked { background: var(--accent); border-color: var(--accent); }
+
+  .action-body  { flex: 1; min-width: 0; }
+  .action-top   { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .action-text  { font-size: 13px; }
+  .action-row.done .action-text { text-decoration: line-through; }
+  .action-detail { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+  .tag { font-size: 10px; font-weight: 600; padding: 1px 7px;
+         border-radius: 20px; white-space: nowrap; }
+  .tag-jil-mis             { background: #dbeafe; color: #1d4ed8; }
+  .tag-jsl-command-centre  { background: #dcfce7; color: #15803d; }
+  .tag-jsl-daily-upload    { background: #d1fae5; color: #065f46; }
+  .tag-ajay-list           { background: #ede9fe; color: #6d28d9; }
+  .tag-jindal-accounts-app { background: #fef3c7; color: #b45309; }
+  .tag-sg-cmd-centre       { background: #e0f2fe; color: #0369a1; }
+  .tag-default             { background: #f3f4f6; color: #374151; }
+
+  .update-row { display: flex; align-items: baseline; gap: 12px;
+                padding: 10px 18px; border-bottom: 0.5px solid var(--border); }
+  .update-row:last-child { border-bottom: none; }
+  .update-date { font-size: 12px; color: var(--dimmer); font-family: monospace;
+                 white-space: nowrap; width: 82px; flex-shrink: 0; }
+  .update-text { font-size: 13px; flex: 1; }
+
+  .loading { padding: 28px 18px; color: var(--dimmer); font-size: 13px; }
+  .err     { padding: 16px 18px; color: #b91c1c; font-size: 12px; }
+
+  @media (max-width: 900px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .kpi-strip { grid-template-columns: repeat(2,1fr); }
   }
-  header h1 { font-size: 18px; font-weight: 700; }
-  header .sub { font-size: 12px; color: var(--dim); }
-  header a { margin-left: auto; font-size: 12px; color: var(--accent); text-decoration: none; }
-
-  .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
-
-  /* Projects strip */
-  .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-              gap: 16px; margin-bottom: 28px; }
-  .project-card {
-    background: #fff;
-    border-radius: 12px;
-    border-top: 3px solid var(--accent);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    padding: 18px 20px;
-  }
-  .project-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-  .project-card .desc { font-size: 12px; color: var(--dim); margin-bottom: 12px; }
-  .project-card .meta { display: flex; gap: 16px; font-size: 11px; color: var(--dim); }
-  .project-card .meta strong { color: var(--text); }
-  .project-card a { font-size: 11px; color: var(--accent); }
-
-  /* Updates feed */
-  .feed-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
-  .feed-header h2 { font-size: 15px; font-weight: 600; }
-  .feed-header .count { font-size: 12px; color: var(--dim); }
-
-  .update-list { display: flex; flex-direction: column; gap: 10px; }
-  .update-card {
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    padding: 14px 18px;
-    display: grid;
-    grid-template-columns: 90px 120px 1fr 80px;
-    gap: 12px;
-    align-items: start;
-  }
-  .update-date { font-size: 12px; font-weight: 600; color: var(--dim); font-family: monospace; }
-  .update-project { font-size: 11px; font-weight: 600; color: var(--accent);
-                    background: #e8f0fe; border-radius: 4px; padding: 2px 8px;
-                    white-space: nowrap; align-self: start; }
-  .update-text { font-size: 13px; color: var(--text); line-height: 1.5; }
-  .update-source { font-size: 10px; color: #aaa; text-align: right; padding-top: 2px; }
-
-  .empty { text-align: center; padding: 60px; color: var(--dim); }
-  .empty h2 { color: var(--text); margin-bottom: 8px; }
 </style>
 </head>
 <body>
-<header>
-  <div>
-    <h1>SG Cmd Centre</h1>
-    <div class="sub">Project update log · {{ projects|length }} active project{{ 's' if projects|length != 1 }}</div>
-  </div>
-  <a href="/health">⬤ health</a>
-</header>
 
-<div class="container">
-  {% if error %}
-  <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:16px 20px;margin-bottom:20px;color:#7f1d1d;font-size:13px;">
-    <strong>⚠ Configuration error:</strong> {{ error }}
-  </div>
-  {% endif %}
+<div class="topbar">
+  <span class="topbar-title">Sanjiv &#8212; Command Centre</span>
+  <span class="topbar-date" id="today-date"></span>
+</div>
 
-  <!-- Projects -->
-  <div class="projects">
-    {% for p in projects %}
-    <div class="project-card">
-      <h3>{{ p.name }}</h3>
-      <div class="desc">{{ p.description or '—' }}</div>
-      <div class="meta">
-        <span><strong>{{ p.update_count }}</strong> updates</span>
-        <span>Last: <strong>{{ p.last_update or '—' }}</strong></span>
-        {% if p.url %}<a href="{{ p.url }}" target="_blank">↗ Open</a>{% endif %}
-      </div>
+<div class="page">
+
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-label">Active Projects</div>
+      <div class="kpi-value" id="kpi-projects">&#8212;</div>
     </div>
-    {% endfor %}
-  </div>
-
-  <!-- Update feed -->
-  <div class="feed-header">
-    <h2>Recent Updates</h2>
-    <span class="count">{{ updates|length }} shown</span>
-  </div>
-
-  {% if updates %}
-  <div class="update-list">
-    {% for u in updates %}
-    <div class="update-card">
-      <div class="update-date">{{ u.update_date }}</div>
-      <div class="update-project">{{ u.project_name }}</div>
-      <div class="update-text">{{ u.update_text }}</div>
-      <div class="update-source">{{ u.source }}</div>
+    <div class="kpi-card">
+      <div class="kpi-label">Open Actions</div>
+      <div class="kpi-value" id="kpi-actions">&#8212;</div>
     </div>
-    {% endfor %}
+    <div class="kpi-card">
+      <div class="kpi-label">Updates Today</div>
+      <div class="kpi-value" id="kpi-today">&#8212;</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Last Updated</div>
+      <div class="kpi-value" id="kpi-last" style="font-size:18px">&#8212;</div>
+      <div class="kpi-sub"   id="kpi-last-project"></div>
+    </div>
   </div>
-  {% else %}
-  <div class="empty">
-    <h2>No updates yet</h2>
-    <p>POST to <code>/api/log-update</code> to log your first update.</p>
+
+  <div class="grid2">
+    <div>
+      <div class="section-label">Projects</div>
+      <div class="card" id="projects-list"><div class="loading">Loading&#8230;</div></div>
+    </div>
+    <div>
+      <div class="section-label">Action Items</div>
+      <div class="card" id="actions-list"><div class="loading">Loading&#8230;</div></div>
+    </div>
   </div>
-  {% endif %}
+
+  <div class="section-label">Recent Updates</div>
+  <div class="card" id="updates-list"><div class="loading">Loading&#8230;</div></div>
 
 </div>
+
+<script>
+document.getElementById("today-date").textContent =
+  new Date().toLocaleDateString("en-GB", {weekday:"long",day:"numeric",month:"long",year:"numeric"});
+
+function tagClass(name) {
+  var k = (name||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
+  var m = {
+    "jil-mis":"tag-jil-mis",
+    "jsl-command-centre":"tag-jsl-command-centre",
+    "jsl-daily-upload":"tag-jsl-daily-upload",
+    "ajay-list":"tag-ajay-list",
+    "jindal-accounts-app":"tag-jindal-accounts-app",
+    "sg-cmd-centre":"tag-sg-cmd-centre"
+  };
+  return "tag "+(m[k]||"tag-default");
+}
+
+function badgeClass(s) {
+  return "badge badge-"+(s==="active"?"active":s==="dev"?"dev":"paused");
+}
+
+function esc(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function apiFetch(url) {
+  return fetch(url).then(function(r) {
+    if (!r.ok) throw new Error("HTTP "+r.status);
+    return r.json();
+  });
+}
+
+/* ── Projects ────────────────────────────────────────────────── */
+apiFetch("/api/projects").then(function(data) {
+  var el = document.getElementById("projects-list");
+  if (!data.length) { el.innerHTML = "<div class='loading'>No projects.</div>"; return; }
+  document.getElementById("kpi-projects").textContent =
+    data.filter(function(p){ return p.status==="active"; }).length;
+  el.innerHTML = data.map(function(p) {
+    return "<div class='project-row'>" +
+      "<div class='project-info'>" +
+        "<div class='project-name'>" + esc(p.name) + "</div>" +
+        "<div class='project-desc'>" + esc(p.description||"") + "</div>" +
+      "</div>" +
+      "<div class='project-right'>" +
+        "<span class='" + badgeClass(p.status) + "'>" + esc(p.status) + "</span>" +
+        (p.url ? "<a href='" + esc(p.url) + "' target='_blank' class='link-icon' title='Open'>&#8599;</a>" : "") +
+      "</div>" +
+    "</div>";
+  }).join("");
+}).catch(function(e) {
+  document.getElementById("projects-list").innerHTML = "<div class='err'>Error: "+esc(e.message)+"</div>";
+});
+
+/* ── Action items ────────────────────────────────────────────── */
+apiFetch("/api/action-items").then(function(data) {
+  var el = document.getElementById("actions-list");
+  if (!data.length) { el.innerHTML = "<div class='loading'>No action items.</div>"; return; }
+  document.getElementById("kpi-actions").textContent =
+    data.filter(function(a){ return !a.done; }).length;
+
+  el.innerHTML = data.map(function(a) {
+    return "<div class='action-row" + (a.done?" done":"") + "' data-id='" + a.id + "'>" +
+      "<input type='checkbox' class='action-cb'" + (a.done?" checked":"") + ">" +
+      "<div class='action-body'>" +
+        "<div class='action-top'>" +
+          "<span class='" + tagClass(a.project_name) + "'>" + esc(a.project_name) + "</span>" +
+          "<span class='action-text'>" + esc(a.action_text) + "</span>" +
+        "</div>" +
+        (a.detail_text ? "<div class='action-detail'>" + esc(a.detail_text) + "</div>" : "") +
+      "</div>" +
+    "</div>";
+  }).join("");
+
+  el.querySelectorAll(".action-cb").forEach(function(cb) {
+    cb.addEventListener("change", function() {
+      var row  = cb.closest(".action-row");
+      var id   = row.dataset.id;
+      var done = cb.checked;
+      fetch("/api/action-items/"+id, {
+        method:"PATCH",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({done: done})
+      }).then(function(r) {
+        if (!r.ok) throw new Error("HTTP "+r.status);
+        row.classList.toggle("done", done);
+        document.getElementById("kpi-actions").textContent =
+          el.querySelectorAll(".action-row:not(.done)").length;
+      }).catch(function(e) {
+        console.error(e);
+        cb.checked = !done;
+      });
+    });
+  });
+}).catch(function(e) {
+  document.getElementById("actions-list").innerHTML = "<div class='err'>Error: "+esc(e.message)+"</div>";
+});
+
+/* ── Updates ─────────────────────────────────────────────────── */
+apiFetch("/api/updates?limit=20").then(function(data) {
+  var today = new Date().toISOString().slice(0,10);
+  document.getElementById("kpi-today").textContent =
+    data.filter(function(u){ return u.update_date===today; }).length;
+  if (data.length) {
+    document.getElementById("kpi-last").textContent = data[0].update_date||"";
+    document.getElementById("kpi-last-project").textContent = data[0].project_name||"";
+  } else {
+    document.getElementById("kpi-last").textContent = "0";
+  }
+  var el = document.getElementById("updates-list");
+  if (!data.length) {
+    el.innerHTML = "<div class='loading'>No updates yet. POST to /api/log-update to add one.</div>";
+    return;
+  }
+  el.innerHTML = data.map(function(u) {
+    return "<div class='update-row'>" +
+      "<span class='update-date'>" + esc(u.update_date||"") + "</span>" +
+      "<span class='" + tagClass(u.project_name) + "'>" + esc(u.project_name) + "</span>" +
+      "<span class='update-text'>" + esc(u.update_text) + "</span>" +
+    "</div>";
+  }).join("");
+}).catch(function(e) {
+  document.getElementById("updates-list").innerHTML = "<div class='err'>Error: "+esc(e.message)+"</div>";
+});
+</script>
 </body>
 </html>
