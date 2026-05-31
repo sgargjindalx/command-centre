@@ -242,7 +242,7 @@ def api_log_update():
         return jsonify({"error": "DATABASE_URL not configured"}), 503
     _try_apply_schema()
     body         = request.get_json(silent=True) or {}
-    project_name = (body.get("project_name") or "").strip()
+    project_name = (body.get("project_name") or body.get("project") or "").strip()
     update_text  = (body.get("update_text")  or "").strip()
     update_date  = (body.get("update_date")  or "").strip()
     source       = (body.get("source")       or "claude_project").strip()

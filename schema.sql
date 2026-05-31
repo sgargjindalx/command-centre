@@ -29,20 +29,20 @@ CREATE TABLE IF NOT EXISTS action_items (
 
 -- ── Seed projects (upsert) ───────────────────────────────────────────
 INSERT INTO projects (name, description, url, status) VALUES
-  ('JIL MIS',             'Management Information System',  'https://web-production-4c602.up.railway.app', 'active'),
-  ('JSL Command Centre',  'MD Dashboard on Snowflake',      '',                                            'active'),
-  ('JSL Daily Upload',    'Daily data pipeline',            '',                                            'active'),
-  ('Ajay List',           'Task tracking',                  '',                                            'active'),
-  ('Jindal Accounts App', 'Finance app',                    '',                                            'dev'),
-  ('SG Cmd Centre',       'Personal project tracker',       'https://web-production-ee75d.up.railway.app', 'active')
+  ('JIL MIS',             'Management Information System', 'https://web-production-4c602.up.railway.app', 'active'),
+  ('JSL Command Centre',  'MD Dashboard on Snowflake',     '',                                            'active'),
+  ('JSL Daily Upload',    'Daily data pipeline',           '',                                            'active'),
+  ('Ajay List',           'Task tracking',                 '',                                            'active'),
+  ('Jindal Accounts App', 'Finance app',                   '',                                            'dev')
 ON CONFLICT (name) DO UPDATE
   SET description = EXCLUDED.description,
       url         = EXCLUDED.url,
       status      = EXCLUDED.status;
 
--- Remove stale naming attempts from earlier sessions
-DELETE FROM projects WHERE name IN ('SG Command Centre')
-  AND NOT EXISTS (SELECT 1 FROM project_updates WHERE project_id = projects.id);
+-- Remove SG Cmd Centre and earlier stale naming rows
+DELETE FROM projects WHERE name IN ('SG Cmd Centre', 'SG Command Centre')
+  AND NOT EXISTS (SELECT 1 FROM project_updates WHERE project_id = projects.id)
+  AND NOT EXISTS (SELECT 1 FROM action_items    WHERE project_id = projects.id);
 
 -- ── Seed action items (idempotent via text match) ────────────────────
 INSERT INTO action_items (project_id, action_text, detail_text)
