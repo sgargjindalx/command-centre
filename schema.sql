@@ -20,6 +20,10 @@ CREATE TABLE IF NOT EXISTS project_updates (
 
 -- Seed projects (idempotent)
 INSERT INTO projects (name, description, url) VALUES
-  ('JIL MIS',            'Management Information System',   'https://web-production-4c602.up.railway.app'),
-  ('JSL Command Centre',  'MD Command Centre on Snowflake', '')
+  ('JIL MIS', 'Management Information System', 'https://web-production-4c602.up.railway.app'),
+  ('SG Cmd Centre', 'Personal project tracker', 'https://web-production-ee75d.up.railway.app')
 ON CONFLICT (name) DO NOTHING;
+
+-- Clean up any stale seed rows from earlier naming attempts
+DELETE FROM projects WHERE name IN ('JSL Command Centre', 'SG Command Centre')
+  AND NOT EXISTS (SELECT 1 FROM project_updates WHERE project_id = projects.id);

@@ -1,4 +1,4 @@
-"""JSL Command Centre — standalone Flask app."""
+"""SG Cmd Centre — standalone Flask app."""
 import logging
 from datetime import datetime
 from functools import wraps
