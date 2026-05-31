@@ -201,7 +201,7 @@ apiFetch("/api/projects").then(function(data) {
       "</div>" +
       "<div class='project-right'>" +
         "<span class='" + badgeClass(p.status) + "'>" + esc(p.status) + "</span>" +
-        (p.url ? "<a href='" + esc(p.url) + "' target='_blank' class='link-icon' title='Open " + esc(p.name) + "'><svg width='13' height='13' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M5 2H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7' stroke='currentColor' stroke-width='1.4' stroke-linecap='round'/><path d='M8 1h3v3M11 1 6 6' stroke='currentColor' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg></a>" : "") +
+        ((p.url && p.url.trim()) ? "<a href='" + esc(p.url) + "' target='_blank' class='link-icon' title='Open " + esc(p.name) + "'><svg width='13' height='13' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M5 2H2a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7' stroke='currentColor' stroke-width='1.4' stroke-linecap='round'/><path d='M8 1h3v3M11 1 6 6' stroke='currentColor' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg></a>" : "") +
       "</div>" +
     "</div>";
   }).join("");

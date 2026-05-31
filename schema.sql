@@ -32,7 +32,7 @@ INSERT INTO projects (name, description, url, status) VALUES
   ('JIL MIS',             'Management Information System', 'https://web-production-4c602.up.railway.app', 'active'),
   ('JSL Command Centre',  'MD Dashboard on Snowflake',     '',                                            'active'),
   ('JSL Daily Upload',    'Daily data pipeline',           '',                                            'active'),
-  ('Ajay List',           'Task tracking',                 '',                                            'active'),
+  ('Ajay List',           'Task tracking',                 'https://jindalx-my.sharepoint.com/personal/sgarg_jindalx_com/Lists/Ajays%20Tasks/AllItems.aspx?env=WebViewList&npsAction=createList', 'active'),
   ('Jindal Accounts App', 'Finance app',                   '',                                            'dev')
 ON CONFLICT (name) DO UPDATE
   SET description = EXCLUDED.description,
